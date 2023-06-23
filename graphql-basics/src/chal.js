@@ -1,11 +1,41 @@
-const chal1 = "I am a string"
-let val = 'I am a value'
-let num = 0
-const doMathSum = (num1, num2) => {
-    return num1 + num2
-}
-const doMathSub = (num1, num2) => {
-    return num1 - num2
+import { GraphQLServer } from "graphql-yoga";
+
+// Type definitions (schema)
+const typeDefs = `
+    type Query {
+        title: String!
+        price: Float!
+        releaseYear: Int
+        rating: Float
+        inStock: Boolean!
+    }
+`
+
+// Resolvers
+const resolvers = {
+    Query: {
+        title() {
+            return "Cheese"
+        },
+        price() {
+            return 4.99
+        },
+        releaseYear() {
+            return 2023
+        },
+        rating() {
+            return null
+        },
+        inStock() {
+            return true
+        }
+    }
 }
 
-export { doMathSub, doMathSum, chal1 as default }
+const server = new GraphQLServer({
+    typeDefs, resolvers
+})
+
+server.start(() => {
+    console.log("I am a dif server running on port 4000")
+})
