@@ -8,10 +8,8 @@ import { GraphQLServer } from 'graphql-yoga'
 // type defs (schema)
 const typeDefs = `
     type Query {
-        greeting(name: String, position: String): String!
         me: User!
-        post: Post!
-        add(arg0: Float!, arg1: Float!): Float!
+        posts: [Post!]!
     }
 
     type Post {
@@ -33,19 +31,6 @@ const typeDefs = `
 // resolvers
 const resolvers = {
     Query: {
-        greeting(parent, args, ctx, info) {
-            if (args.name && args.position) {
-                return `Hello ${args.name}, you are the best ${args.position}`
-            }
-            if (args.name) {
-                return `Hello ${args.name}`
-            } else {
-                return "Hello stranger"
-            }
-        },
-        add(parent, args, ctx, info) {
-            return args.arg0 + args.arg1
-        },
         me() {
             return {
                 id: 'admin12312',
@@ -54,13 +39,20 @@ const resolvers = {
                 age: 29
             }
         },
-        post() {
-            return {
-                id: "post_123123",
-                title: "How to write GQL",
-                body: "I am a post",
-                published: false
-            }
+        posts() {
+            return [
+                {
+                    id: "post_123123",
+                    title: "How to write GQL",
+                    body: "I am a post",
+                    published: false
+                }, {
+                    id: "post_123121",
+                    title: "How to write GQL Pt2",
+                    body: "I am a post",
+                    published: false
+                }
+            ]
         },
     }
 }
