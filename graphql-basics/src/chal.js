@@ -3,32 +3,29 @@ import { GraphQLServer } from "graphql-yoga";
 // Type definitions (schema)
 const typeDefs = `
     type Query {
+       post: Post
+    }
+
+    type Post {
+        id: ID!
         title: String!
-        price: Float!
-        releaseYear: Int
-        rating: Float
-        inStock: Boolean!
+        body: String!
+        published: Boolean!
     }
 `
 
 // Resolvers
 const resolvers = {
     Query: {
-        title() {
-            return "Cheese"
+        post() {
+            return {
+                id: "post_123123",
+                title: "How to write GQL",
+                body: "I am a post",
+                published: false
+            }
         },
-        price() {
-            return 4.99
-        },
-        releaseYear() {
-            return 2023
-        },
-        rating() {
-            return null
-        },
-        inStock() {
-            return true
-        }
+
     }
 }
 
