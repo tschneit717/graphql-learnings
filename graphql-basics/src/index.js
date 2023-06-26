@@ -7,17 +7,17 @@ import { GraphQLServer } from 'graphql-yoga'
 
 const users = [
     {
-        id: 1,
+        id: "1",
         name: "Tom",
         email: "tschneit717@gmail.com",
         age: 29
     }, {
-        id: 2,
+        id: "2",
         name: "Anna",
         email: "anna@example.com",
         age: 27
     }, {
-        id: 3,
+        id: "3",
         name: "Jeff",
         email: "jeff.probst@cbs.com",
         age: 62
@@ -29,18 +29,21 @@ const posts = [
         id: "post_123123",
         title: "How to write GQL",
         body: "I am a post",
-        published: false
+        published: false,
+        author: "1"
     }, {
         id: "post_123121",
         title: "How to write GQL Pt2",
         body: "I am a post",
-        published: false
+        published: false,
+        author: "1"
     },
     {
         id: "post_3i22323",
         title: "How Jeff lives on Survivor",
         body: "Jeff is inhuman and loves to be on survivor",
-        published: true
+        published: true,
+        author: "3"
     }
 ]
 
@@ -57,6 +60,7 @@ const typeDefs = `
         title: String!
         body: String!
         published: Boolean!
+        author: User!
     }
 
     type User {
@@ -90,9 +94,11 @@ const resolvers = {
         },
         posts(parent, args, ctx, info) {
             const { query, isPublished } = args
-            if (!args.query && isPublished === null) {
+            console.log(query, isPublished)
+            if (query === undefined && isPublished === undefined) {
                 return posts
             }
+
             return posts.filter(post => {
                 const titleMatch = post.title.toLowerCase().includes(query.toLowerCase())
                 const bodyMatch = post.body.toLowerCase().includes(query.toLowerCase())
@@ -104,6 +110,11 @@ const resolvers = {
             })
 
         },
+    },
+    Post: {
+        author(parent, args, ctx, info) {
+            return users.find(user => user.id === parent.author)
+        }
     }
 }
 
