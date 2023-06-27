@@ -1,5 +1,5 @@
 import { GraphQLServer } from 'graphql-yoga'
-
+import { v4 as uuidv4 } from 'uuid';
 
 // Scalar types = string, int, float, boolean, ID
 // Scalar type is a type that stores a single discreet value
@@ -86,6 +86,11 @@ const typeDefs = `
         comment(query: String): [Comment!]!
     }
 
+
+    type Mutation {
+        createUser(name: String!, email: String!, age: Int): User!
+    }
+
     type Post {
         id: ID!
         title: String!
@@ -158,6 +163,24 @@ const resolvers = {
             }
         }
     },
+    Mutation: {
+        createUser(parent, args, ctx, info) {
+            const emailTaken = users.some(user => user.email === args.email)
+            if (emailTaken) {
+                throw new Error('User email is taken')
+            }
+
+            const user = {
+                id: uuidv4(),
+                name: args.name,
+                email: args.email,
+                age: args.age
+            }
+
+            users.push(user)
+            return user
+        }
+    },
     Post: {
         author(parent, args, ctx, info) {
             return users.find(user => user.id === parent.author)
@@ -183,7 +206,7 @@ const resolvers = {
         post(parent, args, ctx, info) {
             return posts.find(post => post.id === parent.post)
         }
-    }
+    },
 }
 
 const server = new GraphQLServer({
