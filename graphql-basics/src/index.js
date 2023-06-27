@@ -10,7 +10,7 @@ const users = [
         id: "1",
         name: "Tom",
         email: "tschneit717@gmail.com",
-        age: 29
+        age: 29,
     }, {
         id: "2",
         name: "Anna",
@@ -30,20 +30,50 @@ const posts = [
         title: "How to write GQL",
         body: "I am a post",
         published: false,
-        author: "1"
+        author: "1",
+        comments: ['comment_1231230123']
     }, {
         id: "post_123121",
         title: "How to write GQL Pt2",
         body: "I am a post",
         published: false,
-        author: "1"
+        author: "1",
+        comments: ['comment_3231234123232']
     },
     {
         id: "post_3i22323",
         title: "How Jeff lives on Survivor",
         body: "Jeff is inhuman and loves to be on survivor",
         published: true,
-        author: "3"
+        author: "3",
+        comments: ['comment_123092134324', 'comment_092348324234']
+    }
+]
+
+const comments = [
+    {
+        id: 'comment_1231230123',
+        text: 'Good article',
+        author: '3',
+        post: 'post_123123'
+    },
+    {
+        id: 'comment_123092134324',
+        text: 'Amazing stuff',
+        author: '3',
+        post: 'post_3i22323'
+    },
+    {
+        id: 'comment_092348324234',
+        text: 'gee willikers',
+        author: '3',
+        post: 'post_3i22323'
+    },
+    {
+        id: 'comment_3231234123232',
+        text: 'You are a legend',
+        author: '3',
+        post: 'post_123121'
     }
 ]
 
@@ -53,6 +83,7 @@ const typeDefs = `
         me: User!
         posts(query: String, isPublished: Boolean): [Post!]!
         users(query: String): [User!]!
+        comment(query: String): [Comment!]!
     }
 
     type Post {
@@ -61,6 +92,7 @@ const typeDefs = `
         body: String!
         published: Boolean!
         author: User!
+        comments: [Comment!]!
     }
 
     type User {
@@ -68,8 +100,16 @@ const typeDefs = `
         name: String!
         email: String!
         age: Int
+        posts: [Post!]!
+        comments: [Comment!]!
     }
 
+    type Comment {
+        id: ID!
+        text: String!
+        author: User!
+        post: Post!
+    }
 `
 
 // resolvers
@@ -108,12 +148,40 @@ const resolvers = {
                 }
                 return (titleMatch || bodyMatch) && post.published === isPublished
             })
-
         },
+        comment(parent, args, ctx, info) {
+            const { query } = args
+            if (query) {
+                return comments.filter(comment => comment.text.toLowerCase().includes(query.toLowerCase()))
+            } else {
+                return comments
+            }
+        }
     },
     Post: {
         author(parent, args, ctx, info) {
             return users.find(user => user.id === parent.author)
+        },
+        comments(parent, args, ctx, info) {
+            return comments.filter(comment => {
+                return !!parent.comments.find(parentComment => parentComment === comment.id)
+            })
+        }
+    },
+    User: {
+        posts(parent, args, ctx, info) {
+            return posts.filter(post => post.author === parent.id)
+        },
+        comments(parent, args, ctx, info) {
+            return comments.filter(comment => comment.author === parent.id)
+        }
+    },
+    Comment: {
+        author(parent, args, ctx, info) {
+            return users.find(user => user.id === parent.author)
+        },
+        post(parent, args, ctx, info) {
+            return posts.find(post => post.id === parent.post)
         }
     }
 }
